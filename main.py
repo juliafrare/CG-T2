@@ -158,7 +158,41 @@ textures_coord_list = []
 #####CARREGANDO OS MODELOS
 ##########################
 
-#1 - casa
+#1 - terreno
+modelo = load_model_from_file('objects/terreno/meu_terreno.obj')
+
+### inserindo vertices do modelo no vetor de vertices
+print('Processando modelo meu_terreno.obj. Vertice inicial:',len(vertices_list))
+for face in modelo['faces']:
+    for vertice_id in face[0]:
+        vertices_list.append( modelo['vertices'][vertice_id-1] )
+    for texture_id in face[1]:
+        textures_coord_list.append( modelo['texture'][texture_id-1] )
+print('Processando modelo meu_terreno.obj. Vertice final:',len(vertices_list))
+
+### inserindo coordenadas de textura do modelo no vetor de texturas
+
+### carregando textura equivalente e definindo um id (buffer): use um id por textura!
+load_texture_from_file(0,'objects/terreno/10450_Rectangular_Grass_Patch_v1_Diffuse.jpg')
+
+#2 - ceu
+modelo = load_model_from_file('objects/ceu/sky.obj')
+
+### inserindo vertices do modelo no vetor de vertices
+print('Processando modelo sky.obj. Vertice inicial:',len(vertices_list))
+for face in modelo['faces']:
+    for vertice_id in face[0]:
+        vertices_list.append( modelo['vertices'][vertice_id-1] )
+    for texture_id in face[1]:
+        textures_coord_list.append( modelo['texture'][texture_id-1] )
+print('Processando modelo sky.obj. Vertice final:',len(vertices_list))
+
+### inserindo coordenadas de textura do modelo no vetor de texturas
+
+### carregando textura equivalente e definindo um id (buffer): use um id por textura!
+load_texture_from_file(1,'objects/ceu/cloudy2.jpg')
+
+#3 - caixa
 modelo = load_model_from_file('objects/caixa/cube.obj')
 
 ### inserindo vertices do modelo no vetor de vertices
@@ -172,9 +206,8 @@ print('Processando modelo cube.obj. Vertice final:',len(vertices_list))
 
 ### inserindo coordenadas de textura do modelo no vetor de texturas
 
-
 ### carregando textura equivalente e definindo um id (buffer): use um id por textura!
-load_texture_from_file(0,'objects/caixa/crate1_diffuse.png')
+load_texture_from_file(2,'objects/caixa/crate1_diffuse.png')
 
 ################################
 # Request a buffer slot from GPU
@@ -209,7 +242,7 @@ glVertexAttribPointer(loc_texture_coord, 2, GL_FLOAT, False, stride, offset)
 ##########################
 #####DESENHANDO OS OBJETOS
 ##########################
-def desenha_casa():
+def desenha_terreno():
     
     
     # aplica a matriz model
@@ -219,7 +252,59 @@ def desenha_casa():
     r_x = 0.0; r_y = 0.0; r_z = 1.0;
     
     # translacao
-    t_x = 0.0; t_y = 0.0; t_z = 15.0;
+    t_x = 0.0; t_y = -1.5; t_z = 0.0;
+    
+    # escala
+    s_x = 100.0; s_y = 1.0; s_z = 100.0;
+    
+    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    loc_model = glGetUniformLocation(program, "model")
+    glUniformMatrix4fv(loc_model, 1, GL_TRUE, mat_model)
+       
+    #define id da textura do modelo
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+    
+    # desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 0, 6) ## renderizando
+
+def desenha_ceu():
+    
+    
+    # aplica a matriz model
+    
+    # rotacao
+    angle = 0.0;
+    r_x = 0.0; r_y = 0.0; r_z = 1.0;
+    
+    # translacao
+    t_x = 0.0; t_y = 0.0; t_z = -100.0;
+    
+    # escala
+    s_x = 100.0; s_y = 100.0; s_z = 0.0;
+    
+    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    loc_model = glGetUniformLocation(program, "model")
+    glUniformMatrix4fv(loc_model, 1, GL_TRUE, mat_model)
+       
+    #define id da textura do modelo
+    glBindTexture(GL_TEXTURE_2D, 1)
+    
+    
+    # desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 6, 12) ## renderizando
+
+def desenha_caixa():
+    
+    
+    # aplica a matriz model
+    
+    # rotacao
+    angle = 0.0;
+    r_x = 0.0; r_y = 0.0; r_z = 1.0;
+    
+    # translacao
+    t_x = 0.0; t_y = 0.0; t_z = 1.0;
     
     # escala
     s_x = 1.0; s_y = 1.0; s_z = 1.0;
@@ -229,14 +314,16 @@ def desenha_casa():
     glUniformMatrix4fv(loc_model, 1, GL_TRUE, mat_model)
        
     #define id da textura do modelo
-    glBindTexture(GL_TEXTURE_2D, 0)
+    glBindTexture(GL_TEXTURE_2D, 2)
     
     
     # desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 0, 36) ## renderizando
+    glDrawArrays(GL_TRIANGLES, 12, 48) ## renderizando
 
-#eventos camera
-cameraPos   = glm.vec3(0.0,  0.0,  1.0);
+#############################
+######EVENTOS CAMERA
+#############################
+cameraPos   = glm.vec3(-1.0,  0.0,  -1.0);
 cameraFront = glm.vec3(0.0,  0.0, -1.0);
 cameraUp    = glm.vec3(0.0,  1.0,  0.0);
 
@@ -365,8 +452,9 @@ while not glfw.window_should_close(window):
     
     
     #desenhar objetos
-    desenha_casa()
-
+    desenha_terreno()
+    desenha_ceu()
+    desenha_caixa()
     
     mat_view = view()
     loc_view = glGetUniformLocation(program, "view")
