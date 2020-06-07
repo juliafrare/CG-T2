@@ -483,11 +483,31 @@ cameraPos   = glm.vec3(-1.0,  1.0,  -5.0)
 cameraFront = glm.vec3(0.0,  0.0, -1.0)
 cameraUp    = glm.vec3(0.0,  1.0,  0.0)
 
+minPos_x = -100.0
+maxPos_x = 100.0
+minPos_y = 0.0
+maxPos_y = 50.0
+minPos_z = -100.0
+maxPos_z = 100.0
 
 polygonal_mode = False
 
 def key_event(window,key,scancode,action,mods):
     global cameraPos, cameraFront, cameraUp, polygonal_mode
+
+    if cameraPos[0] < minPos_x:
+        cameraPos[0] = -99.9
+    if cameraPos[1] < minPos_y:
+        cameraPos[1] = 0.1
+    if cameraPos[2] < minPos_z:
+        cameraPos[2] = -99.9
+
+    if cameraPos[0] > maxPos_x:
+        cameraPos[0] = 99.9
+    if cameraPos[1] > maxPos_y:
+        cameraPos[1] = 49.9
+    if cameraPos[2] > maxPos_z:
+        cameraPos[2] = 99.9
     
     cameraSpeed = 0.2
     if key == 87 and (action==1 or action==2): # tecla W
