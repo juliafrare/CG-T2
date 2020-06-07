@@ -131,7 +131,7 @@ glEnable( GL_BLEND )
 glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 glEnable(GL_LINE_SMOOTH)
 glEnable(GL_TEXTURE_2D)
-qtd_texturas = 10
+qtd_texturas = 11
 textures = glGenTextures(qtd_texturas)
 
 #load texture from file
@@ -157,57 +157,64 @@ textures_coord_list = []
 ##########################
 #####CARREGANDO OS MODELOS
 ##########################
+textures_loaded = 0
+
+def load_model(model_path, texture_path, textures_loaded):
+    modelo = load_model_from_file(model_path)
+
+    ### inserindo vertices do modelo no vetor de vertices
+    print('Processando modelo ' + model_path + '. Vertice inicial:',len(vertices_list))
+    faces_visited = []
+    for face in modelo['faces']:
+        if face[2] not in faces_visited:
+            print(str(face[2]) + ' vertice inicial: ' + str(len(vertices_list)))
+            faces_visited.append(face[2])
+        for vertice_id in face[0]:
+            vertices_list.append( modelo['vertices'][vertice_id-1] )
+        for texture_id in face[1]:
+            textures_coord_list.append( modelo['texture'][texture_id-1] )
+    print('Processando modelo ' + model_path + '. Vertice final:',len(vertices_list))
+
+    ### inserindo coordenadas de textura do modelo no vetor de texturas
+
+    ### carregando textura equivalente e definindo um id (buffer): use um id por textura!
+    load_texture_from_file(textures_loaded, texture_path)
+    textures_loaded += 1
+    return textures_loaded
 
 #1 - terreno
-modelo = load_model_from_file('objects/terreno/meu_terreno.obj')
+textures_loaded = load_model('objects/terreno/terreno.obj', 'objects/terreno/10450_Rectangular_Grass_Patch_v1_Diffuse.jpg', textures_loaded)
 
-### inserindo vertices do modelo no vetor de vertices
-print('Processando modelo meu_terreno.obj. Vertice inicial:',len(vertices_list))
-for face in modelo['faces']:
-    for vertice_id in face[0]:
-        vertices_list.append( modelo['vertices'][vertice_id-1] )
-    for texture_id in face[1]:
-        textures_coord_list.append( modelo['texture'][texture_id-1] )
-print('Processando modelo meu_terreno.obj. Vertice final:',len(vertices_list))
-
-### inserindo coordenadas de textura do modelo no vetor de texturas
-
-### carregando textura equivalente e definindo um id (buffer): use um id por textura!
-load_texture_from_file(0,'objects/terreno/10450_Rectangular_Grass_Patch_v1_Diffuse.jpg')
-
+print("texturas carregadas " + str(textures_loaded))
 #2 - ceu
-modelo = load_model_from_file('objects/ceu/sky.obj')
-
-### inserindo vertices do modelo no vetor de vertices
-print('Processando modelo sky.obj. Vertice inicial:',len(vertices_list))
-for face in modelo['faces']:
-    for vertice_id in face[0]:
-        vertices_list.append( modelo['vertices'][vertice_id-1] )
-    for texture_id in face[1]:
-        textures_coord_list.append( modelo['texture'][texture_id-1] )
-print('Processando modelo sky.obj. Vertice final:',len(vertices_list))
-
-### inserindo coordenadas de textura do modelo no vetor de texturas
-
-### carregando textura equivalente e definindo um id (buffer): use um id por textura!
-load_texture_from_file(1,'objects/ceu/cloudy2.jpg')
+textures_loaded = load_model('objects/ceu/sky.obj', 'objects/ceu/cloudy.png', textures_loaded)
 
 #3 - caixa
-modelo = load_model_from_file('objects/caixa/cube.obj')
+textures_loaded = load_model('objects/caixa/crate.obj', 'objects/caixa/WoodenCrate_Crate_BaseColor.png', textures_loaded)
 
-### inserindo vertices do modelo no vetor de vertices
-print('Processando modelo cube.obj. Vertice inicial:',len(vertices_list))
-for face in modelo['faces']:
-    for vertice_id in face[0]:
-        vertices_list.append( modelo['vertices'][vertice_id-1] )
-    for texture_id in face[1]:
-        textures_coord_list.append( modelo['texture'][texture_id-1] )
-print('Processando modelo cube.obj. Vertice final:',len(vertices_list))
+#4 - casa
+textures_loaded = load_model('objects/casa/farmhouse.obj', 'objects/casa/FarmhouseTexture.jpg', textures_loaded)
 
-### inserindo coordenadas de textura do modelo no vetor de texturas
+#5 - personagem
+textures_loaded = load_model('objects/personagem/anime_character.obj', 'objects/personagem/textures.png', textures_loaded)
 
-### carregando textura equivalente e definindo um id (buffer): use um id por textura!
-load_texture_from_file(2,'objects/caixa/crate1_diffuse.png')
+#6 - mesa
+textures_loaded = load_model('objects/mesa/table.obj', 'objects/mesa/round_table_texture.png', textures_loaded)
+
+#7 - pet
+textures_loaded = load_model('objects/pet/penguin.obj', 'objects/pet/PenguinDiffuseColor.png', textures_loaded)
+
+#8 - carro
+textures_loaded = load_model('objects/carro/car.obj', 'objects/carro/CarTexture1.png', textures_loaded)
+
+#9 - ufo
+textures_loaded = load_model('objects/ufo/ufo_2.obj', 'objects/ufo/UFO_color.jpg', textures_loaded)
+
+load_texture_from_file(textures_loaded, 'objects/ufo/UFO_emi_2.jpg')
+textures_loaded += 1
+
+load_texture_from_file(textures_loaded, 'objects/terreno/dirt_ground_texture.jpg')
+textures_loaded += 1
 
 ################################
 # Request a buffer slot from GPU
@@ -248,14 +255,14 @@ def desenha_terreno():
     # aplica a matriz model
     
     # rotacao
-    angle = 0.0;
-    r_x = 0.0; r_y = 0.0; r_z = 1.0;
+    angle = 0.0
+    r_x = 0.0; r_y = 0.0; r_z = 1.0
     
     # translacao
-    t_x = 0.0; t_y = -1.5; t_z = 0.0;
+    t_x = 0.0; t_y = -0.0001; t_z = 0.0
     
     # escala
-    s_x = 100.0; s_y = 1.0; s_z = 100.0;
+    s_x = 100.0; s_y = 1.0; s_z = 100.0
     
     mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
     loc_model = glGetUniformLocation(program, "model")
@@ -263,25 +270,26 @@ def desenha_terreno():
        
     #define id da textura do modelo
     glBindTexture(GL_TEXTURE_2D, 0)
-
-    
     # desenha o modelo
     glDrawArrays(GL_TRIANGLES, 0, 6) ## renderizando
 
+    #define id da textura do modelo
+    glBindTexture(GL_TEXTURE_2D, 10)
+    # desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 6, 12-6) ## renderizando
+
 def desenha_ceu():
-    
-    
     # aplica a matriz model
     
     # rotacao
-    angle = 0.0;
-    r_x = 0.0; r_y = 0.0; r_z = 1.0;
+    angle = 0.0
+    r_x = 0.0; r_y = 0.0; r_z = 1.0
     
     # translacao
-    t_x = 0.0; t_y = 0.0; t_z = -100.0;
+    t_x = 0.0; t_y = 0.0; t_z = -100.0
     
     # escala
-    s_x = 100.0; s_y = 100.0; s_z = 0.0;
+    s_x = 100.0; s_y = 100.0; s_z = 0.0
     
     mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
     loc_model = glGetUniformLocation(program, "model")
@@ -292,22 +300,20 @@ def desenha_ceu():
     
     
     # desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 6, 12) ## renderizando
+    glDrawArrays(GL_TRIANGLES, 12, 18-12) ## renderizando
 
 def desenha_caixa():
-    
-    
     # aplica a matriz model
     
     # rotacao
-    angle = 0.0;
-    r_x = 0.0; r_y = 0.0; r_z = 1.0;
+    angle = 0.0
+    r_x = 0.0; r_y = 0.0; r_z = 1.0
     
     # translacao
-    t_x = 0.0; t_y = 0.0; t_z = 1.0;
+    t_x = 5.0; t_y = 0.0; t_z = -40.0
     
     # escala
-    s_x = 1.0; s_y = 1.0; s_z = 1.0;
+    s_x = 1.0; s_y = 1.0; s_z = 1.0
     
     mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
     loc_model = glGetUniformLocation(program, "model")
@@ -318,14 +324,164 @@ def desenha_caixa():
     
     
     # desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 12, 48) ## renderizando
+    glDrawArrays(GL_TRIANGLES, 18, 1782-18) ## renderizando
+
+def desenha_casa():
+    # aplica a matriz model
+    
+    # rotacao
+    angle = 180.0
+    r_x = 0.0; r_y = 1.0; r_z = 0.0
+    
+    # translacao
+    t_x = 10.0; t_y = 0.0; t_z = 60.0
+    
+    # escala
+    s_x = 1.0; s_y = 1.0; s_z = 1.0
+    
+    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    loc_model = glGetUniformLocation(program, "model")
+    glUniformMatrix4fv(loc_model, 1, GL_TRUE, mat_model)
+       
+    #define id da textura do modelo
+    glBindTexture(GL_TEXTURE_2D, 3)
+    
+    
+    # desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 1782, 2784-1782) ## renderizando
+
+def desenha_personagem():
+    # aplica a matriz model
+    
+    # rotacao
+    angle = 0.0
+    r_x = 0.0; r_y = 1.0; r_z = 0.0
+    
+    # translacao
+    t_x = -10.0; t_y = 1.0; t_z = -80.0
+    
+    # escala
+    s_x = 1.0; s_y = 1.0; s_z = 1.0
+    
+    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    loc_model = glGetUniformLocation(program, "model")
+    glUniformMatrix4fv(loc_model, 1, GL_TRUE, mat_model)
+       
+    #define id da textura do modelo
+    glBindTexture(GL_TEXTURE_2D, 4)
+    
+    
+    # desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 2784, 24114-2784) ## renderizando
+
+def desenha_mesa():
+    # aplica a matriz model
+    
+    # rotacao
+    angle = 0.0
+    r_x = 0.0; r_y = 1.0; r_z = 0.0
+    
+    # translacao
+    t_x = -10.0; t_y = 1.0; t_z = -75.0
+    
+    # escala
+    s_x = 1.0; s_y = 2.0; s_z = 1.0
+    
+    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    loc_model = glGetUniformLocation(program, "model")
+    glUniformMatrix4fv(loc_model, 1, GL_TRUE, mat_model)
+       
+    #define id da textura do modelo
+    glBindTexture(GL_TEXTURE_2D, 5)
+    
+    
+    # desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 24114, 134202-24114) ## renderizando
+
+def desenha_pet():
+    # aplica a matriz model
+    
+    # rotacao
+    angle = 0.0
+    r_x = 0.0; r_y = 1.0; r_z = 0.0
+    
+    # translacao
+    t_x = -7.0; t_y = 1.0; t_z = -77.0
+    
+    # escala
+    s_x = 2.0; s_y = 2.0; s_z = 2.0
+    
+    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    loc_model = glGetUniformLocation(program, "model")
+    glUniformMatrix4fv(loc_model, 1, GL_TRUE, mat_model)
+       
+    #define id da textura do modelo
+    glBindTexture(GL_TEXTURE_2D, 6)
+    
+    
+    # desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 134202, 164610-134202) ## renderizando
+
+altura_carro = 0.0
+up = True
+
+def desenha_carro(altura_carro):
+    # aplica a matriz model
+    
+    # rotacao
+    angle = 0.0
+    r_x = 0.0; r_y = 1.0; r_z = 0.0
+    
+    # translacao
+    t_x = 10.0; t_y = altura_carro; t_z = -50.0
+    
+    # escala
+    s_x = 5.0; s_y = 5.0; s_z = 5.0
+    
+    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    loc_model = glGetUniformLocation(program, "model")
+    glUniformMatrix4fv(loc_model, 1, GL_TRUE, mat_model)
+       
+    #define id da textura do modelo
+    glBindTexture(GL_TEXTURE_2D, 7)
+    
+    
+    # desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 164610, 176004-164610) ## renderizando
+
+def desenha_ufo():
+    # aplica a matriz model
+    
+    # rotacao
+    angle = 0.0
+    r_x = 0.0; r_y = 1.0; r_z = 0.0
+    
+    # translacao
+    t_x = 10.0; t_y = 25.0; t_z = -50.0
+    
+    # escala
+    s_x = 5.0; s_y = 5.0; s_z = 5.0
+    
+    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    loc_model = glGetUniformLocation(program, "model")
+    glUniformMatrix4fv(loc_model, 1, GL_TRUE, mat_model)
+       
+    #define id da textura do modelo
+    glBindTexture(GL_TEXTURE_2D, 8)  
+    
+    # desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 176004, 236604-176004) ## renderizando
+
+    glBindTexture(GL_TEXTURE_2D, 9)
+    # desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 236604, 259536-236604)
 
 #############################
 ######EVENTOS CAMERA
 #############################
-cameraPos   = glm.vec3(-1.0,  0.0,  -1.0);
-cameraFront = glm.vec3(0.0,  0.0, -1.0);
-cameraUp    = glm.vec3(0.0,  1.0,  0.0);
+cameraPos   = glm.vec3(-1.0,  1.0,  -5.0)
+cameraFront = glm.vec3(0.0,  0.0, -1.0)
+cameraUp    = glm.vec3(0.0,  1.0,  0.0)
 
 
 polygonal_mode = False
@@ -401,7 +557,7 @@ def model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z):
     angle = math.radians(angle)
     
     matrix_transform = glm.mat4(1.0) # instanciando uma matriz identidade
-       
+    
     # aplicando rotacao
     matrix_transform = glm.rotate(matrix_transform, angle, glm.vec3(r_x, r_y, r_z))
         
@@ -418,7 +574,7 @@ def model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z):
 
 def view():
     global cameraPos, cameraFront, cameraUp
-    mat_view = glm.lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    mat_view = glm.lookAt(cameraPos, cameraPos + cameraFront, cameraUp)
     mat_view = np.array(mat_view)
     return mat_view
 
@@ -450,12 +606,26 @@ while not glfw.window_should_close(window):
     if polygonal_mode==False:
         glPolygonMode(GL_FRONT_AND_BACK,GL_FILL)
     
-    
+    if altura_carro < 10.0 and up == True:
+        altura_carro += 0.01
+    elif altura_carro > 0.0 and up == False:
+        altura_carro -= 0.01
+    elif altura_carro >= 10.0:
+        up = False
+    elif altura_carro <= 0.0:
+        up = True
+
     #desenhar objetos
     desenha_terreno()
     desenha_ceu()
     desenha_caixa()
-    
+    desenha_casa()
+    desenha_personagem()
+    desenha_mesa()
+    desenha_pet()
+    desenha_carro(altura_carro)
+    desenha_ufo()
+
     mat_view = view()
     loc_view = glGetUniformLocation(program, "view")
     glUniformMatrix4fv(loc_view, 1, GL_FALSE, mat_view)
@@ -463,9 +633,6 @@ while not glfw.window_should_close(window):
     mat_projection = projection()
     loc_projection = glGetUniformLocation(program, "projection")
     glUniformMatrix4fv(loc_projection, 1, GL_FALSE, mat_projection)    
-    
-    
-
     
     glfw.swap_buffers(window)
 
