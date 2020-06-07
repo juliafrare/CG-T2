@@ -11,7 +11,7 @@ glfw.init()
 glfw.window_hint(glfw.VISIBLE, glfw.FALSE);
 altura = 1600
 largura = 1200
-window = glfw.create_window(largura, altura, "Malhas e Texturas", None, None)
+window = glfw.create_window(largura, altura, "Trabalho 2", None, None)
 glfw.make_context_current(window)
 
 #vertex shader
@@ -183,9 +183,8 @@ def load_model(model_path, texture_path, textures_loaded):
     return textures_loaded
 
 #1 - terreno
-textures_loaded = load_model('objects/terreno/terreno.obj', 'objects/terreno/10450_Rectangular_Grass_Patch_v1_Diffuse.jpg', textures_loaded)
+textures_loaded = load_model('objects/terreno/terreno.obj', 'objects/terreno/grass-texture.png', textures_loaded)
 
-print("texturas carregadas " + str(textures_loaded))
 #2 - ceu
 textures_loaded = load_model('objects/ceu/sky.obj', 'objects/ceu/cloudy.png', textures_loaded)
 
@@ -208,10 +207,7 @@ textures_loaded = load_model('objects/pet/penguin.obj', 'objects/pet/PenguinDiff
 textures_loaded = load_model('objects/carro/car.obj', 'objects/carro/CarTexture1.png', textures_loaded)
 
 #9 - ufo
-textures_loaded = load_model('objects/ufo/ufo_2.obj', 'objects/ufo/UFO_color.jpg', textures_loaded)
-
-load_texture_from_file(textures_loaded, 'objects/ufo/UFO_emi_2.jpg')
-textures_loaded += 1
+textures_loaded = load_model('objects/ufo/ufo.obj', 'objects/ufo/UFO_color.jpg', textures_loaded)
 
 load_texture_from_file(textures_loaded, 'objects/terreno/dirt_ground_texture.jpg')
 textures_loaded += 1
@@ -274,16 +270,16 @@ def desenha_terreno():
     glDrawArrays(GL_TRIANGLES, 0, 6) ## renderizando
 
     #define id da textura do modelo
-    glBindTexture(GL_TEXTURE_2D, 10)
+    glBindTexture(GL_TEXTURE_2D, 9)
     # desenha o modelo
     glDrawArrays(GL_TRIANGLES, 6, 12-6) ## renderizando
 
-def desenha_ceu():
+def desenha_ceu(angulo_ceu):
     # aplica a matriz model
     
     # rotacao
-    angle = 0.0
-    r_x = 0.0; r_y = 0.0; r_z = 1.0
+    angle = angulo_ceu
+    r_x = 0.0; r_y = 1.0; r_z = 0.0
     
     # translacao
     t_x = 0.0; t_y = 0.0; t_z = -100.0
@@ -433,7 +429,7 @@ def desenha_carro(altura_carro):
     r_x = 0.0; r_y = 1.0; r_z = 0.0
     
     # translacao
-    t_x = 10.0; t_y = altura_carro; t_z = -50.0
+    t_x = 13.0; t_y = altura_carro; t_z = -50.0
     
     # escala
     s_x = 5.0; s_y = 5.0; s_z = 5.0
@@ -457,7 +453,7 @@ def desenha_ufo():
     r_x = 0.0; r_y = 1.0; r_z = 0.0
     
     # translacao
-    t_x = 10.0; t_y = 25.0; t_z = -50.0
+    t_x = 13.0; t_y = 25.0; t_z = -50.0
     
     # escala
     s_x = 5.0; s_y = 5.0; s_z = 5.0
@@ -470,11 +466,11 @@ def desenha_ufo():
     glBindTexture(GL_TEXTURE_2D, 8)  
     
     # desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 176004, 236604-176004) ## renderizando
+    glDrawArrays(GL_TRIANGLES, 176004, 258816-176004) ## renderizando
 
-    glBindTexture(GL_TEXTURE_2D, 9)
+    #glBindTexture(GL_TEXTURE_2D, 9)
     # desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 236604, 259536-236604)
+    #glDrawArrays(GL_TRIANGLES, 236604, 259536-236604)
 
 #############################
 ######EVENTOS CAMERA
@@ -637,7 +633,10 @@ while not glfw.window_should_close(window):
 
     #desenhar objetos
     desenha_terreno()
-    desenha_ceu()
+    desenha_ceu(0)
+    desenha_ceu(90)
+    desenha_ceu(180)
+    desenha_ceu(270)
     desenha_caixa()
     desenha_casa()
     desenha_personagem()
