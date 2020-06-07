@@ -245,7 +245,7 @@ glVertexAttribPointer(loc_texture_coord, 2, GL_FLOAT, False, stride, offset)
 ##########################
 #####DESENHANDO OS OBJETOS
 ##########################
-def desenha_terreno():
+def desenha_terreno(top):
     
     
     # aplica a matriz model
@@ -255,7 +255,10 @@ def desenha_terreno():
     r_x = 0.0; r_y = 0.0; r_z = 1.0
     
     # translacao
-    t_x = 0.0; t_y = -0.0001; t_z = 0.0
+    if top == 0:
+        t_x = 0.0; t_y = -0.0001; t_z = 0.0
+    else:
+        t_x = 0.0; t_y = 50.0; t_z = 0.0
     
     # escala
     s_x = 100.0; s_y = 1.0; s_z = 100.0
@@ -264,15 +267,21 @@ def desenha_terreno():
     loc_model = glGetUniformLocation(program, "model")
     glUniformMatrix4fv(loc_model, 1, GL_TRUE, mat_model)
        
-    #define id da textura do modelo
-    glBindTexture(GL_TEXTURE_2D, 0)
-    # desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 0, 6) ## renderizando
+    if top == 0:
+        #define id da textura do modelo
+        glBindTexture(GL_TEXTURE_2D, 0)
+        # desenha o modelo
+        glDrawArrays(GL_TRIANGLES, 0, 6) ## renderizando
 
-    #define id da textura do modelo
-    glBindTexture(GL_TEXTURE_2D, 9)
-    # desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 6, 12-6) ## renderizando
+        #define id da textura do modelo
+        glBindTexture(GL_TEXTURE_2D, 9)
+        # desenha o modelo
+        glDrawArrays(GL_TRIANGLES, 6, 12-6) ## renderizando
+    else:
+        #define id da textura do modelo
+        glBindTexture(GL_TEXTURE_2D, 1)
+        # desenha o modelo
+        glDrawArrays(GL_TRIANGLES, 0, 12) ## renderizando
 
 def desenha_ceu(angulo_ceu):
     # aplica a matriz model
@@ -632,7 +641,8 @@ while not glfw.window_should_close(window):
         up = True
 
     #desenhar objetos
-    desenha_terreno()
+    desenha_terreno(0)
+    desenha_terreno(1)
     desenha_ceu(0)
     desenha_ceu(90)
     desenha_ceu(180)
